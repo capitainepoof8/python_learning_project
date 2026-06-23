@@ -1,0 +1,5 @@
+amount=input("Entrez un montant en cfa : ")
+amount_in_euro = round(float(amount) / 655.957, 2)
+amount_in_dollars = round(float(amount_in_euro) * 606, 2)
+print("Le montant en euro est : ", amount_in_euro, "€")
+print("Le montant en dollars est : ", amount_in_dollars, "$")

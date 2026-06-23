@@ -1,0 +1,5 @@
+last_name = input("Quel est votre nom ? : ")
+first_name = input("quel est votre prenom ? : ")
+age = input("quel est votre age ? : ")
+program= input("quel programmee faite vous ? : ")
+print("bonjour ! je m'appel : ",last_name, first_name,"j'ai",age," ans et je suis en",program)
