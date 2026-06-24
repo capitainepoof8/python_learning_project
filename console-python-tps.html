@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>my python learning project</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --text:#111111;
+    --text-dim:#6f6f6f;
+    --card-bg:#dcdcdc;
+    --card-bg-active:#c4c4c4;
+    --accent:#22c55e;
+    --accent-dark:#11532b;
+    --border:#cfcfcf;
+    --console-bg:#0d0f12;
+    --console-text:#4ade80;
+    --error:#dc2626;
+    --success:#16a34a;
+    --mono: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--mono);
+    line-height:1.5;
+  }
+  a{color:var(--accent-dark);}
+
+  .app{max-width:1280px;margin:0 auto;padding:40px 24px 70px;}
+
+  h1{
+    text-align:center;
+    font-size:38px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    margin:0 0 8px;
+  }
+  .sub{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--text-dim);
+    margin:0 0 8px;
+  }
+  .sub a{text-decoration:none;}
+  .sub a:hover{text-decoration:underline;}
+  .toolbar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+    margin-bottom:38px;
+  }
+  #global-status{font-size:12px;color:var(--text-dim);}
+  button.btn{
+    font-family:var(--mono);
+    font-size:12.5px;
+    background:#fff;
+    color:var(--text);
+    border:1.5px solid var(--text);
+    border-radius:5px;
+    padding:6px 13px;
+    cursor:pointer;
+  }
+  button.btn:hover{background:#f1f1f1;}
+  button.btn:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px;}
+  button.btn:active{transform:translateY(1px);}
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(280px,1fr) minmax(320px,1fr);
+    gap:48px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .sidebar{
+    max-height:640px;
+    overflow-y:auto;
+    padding-right:14px;
+    scrollbar-width:thin;
+    scrollbar-color:#111 #e5e5e5;
+  }
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-track{background:#e5e5e5;border-radius:3px;}
+  .sidebar::-webkit-scrollbar-thumb{background:#111;border-radius:3px;}
+
+  .nav-row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:9px 0;
+    cursor:pointer;
+    border:none;
+    background:none;
+    width:100%;
+    text-align:left;
+  }
+  .nav-row:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px;border-radius:6px;}
+  .nav-box{
+    position:relative;
+    flex:0 0 auto;
+    width:230px;
+    background:var(--card-bg);
+    border-left:7px solid var(--accent);
+    border-radius:3px;
+    padding:18px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .15s ease;
+  }
+  .nav-row.active .nav-box{background:var(--card-bg-active);}
+  .nav-row:hover .nav-box{background:#d2d2d2;}
+  .nav-title{
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--accent-dark);
+    letter-spacing:.01em;
+  }
+  .nav-dot{
+    position:absolute;
+    top:6px;
+    right:9px;
+    font-size:10px;
+    color:#b3b3b3;
+  }
+  .nav-dot.running{color:#d99c00;animation:pulse 1s infinite;}
+  .nav-dot.ok{color:var(--success);}
+  .nav-dot.error{color:var(--error);}
+  .nav-desc{
+    flex:1 1 auto;
+    font-size:12px;
+    color:var(--text-dim);
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .detail-panel{
+    background:#e4e4e4;
+    border-radius:6px;
+    padding:18px;
+  }
+  .detail-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .detail-filename{font-weight:700;font-size:16px;color:var(--accent-dark);}
+  .detail-status{margin-left:auto;font-size:13px;color:#b3b3b3;}
+  .detail-status.running{color:#d99c00;animation:pulse 1s infinite;}
+  .detail-status.ok{color:var(--success);}
+  .detail-status.error{color:var(--error);}
+
+  .pane-label{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--text-dim);
+    margin:14px 0 6px;
+  }
+  .pane-label:first-of-type{margin-top:0;}
+
+  pre.code{
+    margin:0;
+    background:#f4f4f4;
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:10px 12px;
+    font-size:12px;
+    line-height:1.55;
+    color:var(--text);
+    white-space:pre-wrap;
+    word-break:break-word;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .tok-kw{color:#7c3aed;}
+  .tok-fn{color:#2563eb;}
+  .tok-str{color:#15803d;}
+
+  .inputs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+  .input-chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:#f4f4f4;
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:4px 7px;
+    font-size:11px;
+  }
+  .input-chip span{color:var(--text-dim);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .input-chip input{
+    width:64px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-family:var(--mono);
+    font-size:11px;
+    padding:3px 5px;
+    color:var(--text);
+  }
+  .input-chip input:focus-visible{outline:2px solid var(--accent-dark);outline-offset:1px;}
+
+  button.rerun{
+    font-family:var(--mono);
+    font-size:11.5px;
+    background:#fff;
+    color:var(--accent-dark);
+    border:1.5px solid var(--accent-dark);
+    border-radius:5px;
+    padding:5px 11px;
+    cursor:pointer;
+    margin:6px 0 0;
+  }
+  button.rerun:hover{background:#eafaf0;}
+  button.rerun:focus-visible{outline:2px solid var(--accent-dark);outline-offset:2px;}
+
+  pre.console{
+    margin:0;
+    background:var(--console-bg);
+    border-radius:5px;
+    padding:10px 12px;
+    font-size:12px;
+    line-height:1.5;
+    color:var(--console-text);
+    white-space:pre-wrap;
+    word-break:break-word;
+    min-height:60px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .dim{color:#777;}
+  .err{color:#ff8a8a;}
+
+  .detail-desc{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+
+  footer{
+    margin-top:46px;
+    font-size:11px;
+    color:var(--text-dim);
+    text-align:center;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .nav-dot.running,.detail-status.running{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>my python learning project</h1>
+  <p class="sub">8 scripts depuis <a href="https://github.com/capitainepoof8/python_learning_project" target="_blank" rel="noopener">github.com/capitainepoof8/python_learning_project</a> — exécutés dans le navigateur via Pyodide</p>
+  <div class="toolbar">
+    <button class="btn" id="rerun-all">↻ tout réexécuter</button>
+    <span id="global-status">chargement de Pyodide…</span>
+  </div>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar" aria-label="liste des scripts"></nav>
+    <section class="detail-panel" id="detail-panel">
+      <div class="detail-head">
+        <span class="detail-filename" id="detail-filename">—</span>
+        <span class="detail-status" id="detail-status">●</span>
+      </div>
+      <p class="pane-label">code source</p>
+      <pre class="code" id="detail-code"></pre>
+      <p class="pane-label">entrées simulées</p>
+      <div class="inputs" id="detail-inputs"></div>
+      <button class="rerun" id="detail-rerun">↻ réexécuter ce script</button>
+      <p class="pane-label">console</p>
+      <pre class="console" id="detail-console"><span class="dim">sélectionnez un script à gauche…</span></pre>
+      <p class="detail-desc" id="detail-desc"></p>
+    </section>
+  </div>
+
+  <footer>exécution 100% locale dans votre navigateur (WebAssembly) · les valeurs d'entrée sont simulées et modifiables</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.28.3/pyodide.min.js"></script>
+<script>
+const scripts = [
+  {
+    id: "main",
+    filename: "main.py",
+    description: "Demande votre nom et votre année de naissance, calcule votre âge actuel et l'an prochain.",
+    prompts: ["Quel est votre nom ? ", "En quelle année êtes-vous né ? "],
+    defaults: ["lou", "1985"],
+    code: `nom = input("Quel est votre nom ? ")
+print("Bonjour: ", nom)
+annee_naissance = int(input("En quelle année êtes-vous né ? "))
+age = 2026 - annee_naissance
+print("Vous avez ", age, " ans.")
+age =int(age)+1
+print("L'année prochaine vous aurez : ",age)`
+  },
+  {
+    id: "presentation",
+    filename: "presentation.py",
+    description: "Se présente : nom, prénom, âge et filière.",
+    prompts: ["Quel est votre nom ? : ", "quel est votre prenom ? : ", "quel est votre age ? : ", "quel programmee faite vous ? : "],
+    defaults: ["will", "lou", "14", "stem"],
+    code: `last_name = input("Quel est votre nom ? : ")
+first_name = input("quel est votre prenom ? : ")
+age = input("quel est votre age ? : ")
+program= input("quel programmee faite vous ? : ")
+print("bonjour ! je m'appel : ",last_name, first_name,"j'ai",age," ans et je suis en",program)`
+  },
+  {
+    id: "moyenne",
+    filename: "moyenne.py",
+    description: "Calcule la moyenne simple de trois notes sur 20.",
+    prompts: ["Entrez la première note : ", "Entrez la deuxième note : ", "Entrez la troisième note : "],
+    defaults: ["14", "16", "12"],
+    code: `grade_1= input("Entrez la première note : ")
+grade_2= input("Entrez la deuxième note : ")
+grade_3= input("Entrez la troisième note : ")
+average = (float(grade_1) + float(grade_2) + float(grade_3)) / 3
+print("Tes notes sont : ", grade_1, grade_2, grade_3)
+print("La moyenne des trois notes est : ", average,"/20")`
+  },
+  {
+    id: "bulletin",
+    filename: "bulletin.py",
+    description: "Calcule un bulletin sur 5 cours (devoir 40% + examen 60%) et la moyenne générale.",
+    prompts: [
+      "Entrez votre nom : ", "Entrez votre prenom : ",
+      "Entrez le nom du premier cours : ", "Entrez la note du devoir(40%) : ", "Entrez la note de l'examen (60%) : ",
+      "Entrez le nom du deuxième cours : ", "Entrez la note du devoir(40%) : ", "Entrez la note de l'examen (60%) : ",
+      "Entrez le nom du troisième cours : ", "Entrez la note du devoir(40%) : ", "Entrez la note de l'examen (60%) : ",
+      "Entrez le nom du quatrième cours : ", "Entrez la note du devoir(40%) : ", "Entrez la note de l'examen (60%) : ",
+      "Entrez le nom du cinquième cours : ", "Entrez la note du devoir(40%) : ", "Entrez la note de l'examen (60%) : "
+    ],
+    defaults: ["Soro","Emmanuel","Mathématiques","15","14","Algèbre","13","16","Comptabilité","17","15","Développement Web","18","17","Anglais","14","13"],
+    code: `last_name = input("Entrez votre nom : ")
+first_name = input("Entrez votre prenom : ")
+
+
+course_1 = input("Entrez le nom du premier cours : ")
+grade_1 = float(input("Entrez la note du devoir(40%) : "))
+exam_1 = float(input("Entrez la note de l'examen (60%) : "))
+
+course_2 = input("Entrez le nom du deuxième cours : ")
+grade_2 = float(input("Entrez la note du devoir(40%) : "))
+exam_2 = float(input("Entrez la note de l'examen (60%) : "))
+
+course_3 = input("Entrez le nom du troisième cours : ")
+grade_3 = float(input("Entrez la note du devoir(40%) : "))
+exam_3 = float(input("Entrez la note de l'examen (60%) : "))
+
+course_4 = input("Entrez le nom du quatrième cours : ")
+grade_4 = float(input("Entrez la note du devoir(40%) : "))
+exam_4 = float(input("Entrez la note de l'examen (60%) : "))
+
+course_5 = input("Entrez le nom du cinquième cours : ")
+grade_5 = float(input("Entrez la note du devoir(40%) : "))
+exam_5 = float(input("Entrez la note de l'examen (60%) : "))
+
+avrage_1 = round(grade_1 * 0.4 + exam_1 * 0.6, 2)
+avrage_2 = round(grade_2 * 0.4 + exam_2 * 0.6, 2)
+avrage_3 = round(grade_3 * 0.4 + exam_3 * 0.6, 2)
+avrage_4 = round(grade_4 * 0.4 + exam_4 * 0.6, 2)
+avrage_5 = round(grade_5 * 0.4 + exam_5 * 0.6, 2)
+
+total_average = round((avrage_1 + avrage_2 + avrage_3 + avrage_4 + avrage_5) / 5, 2)
+
+print("=============bulletin de ",last_name, first_name, " =================")
+
+
+print(course_1, " devoir ", grade_1, " note examen ", exam_1, )
+print(course_2, " devoir ", grade_2, " note examen ", exam_2, )
+print(course_3, " devoir ", grade_3, " note examen ", exam_3, )
+print(course_4, " devoir ", grade_4, " note examen ", exam_4, )
+print(course_5, " devoir ", grade_5, " note examen ", exam_5, )
+
+print("------------------------------------------------------")
+
+print("la moyenne est :  ",total_average, "/20")`
+  },
+  {
+    id: "convertisseur",
+    filename: "convertisseur.py",
+    description: "Convertit un montant en F CFA vers l'euro et le dollar.",
+    prompts: ["Entrez un montant en cfa : "],
+    defaults: ["10000"],
+    code: `amount=input("Entrez un montant en cfa : ")
+amount_in_euro = round(float(amount) / 655.957, 2)
+amount_in_dollars = round(float(amount_in_euro) * 606, 2)
+print("Le montant en euro est : ", amount_in_euro, "€")
+print("Le montant en dollars est : ", amount_in_dollars, "$")`
+  },
+  {
+    id: "cybercafe",
+    filename: "cybercafe.py",
+    description: "Calcule la facture d'une session au cybercafé selon la durée.",
+    prompts: ["Entrez votre nom : ", "Entrez l'heure d'arrivée : ", "Entrez l'heure de départ : "],
+    defaults: ["Emmanuel", "14", "16"],
+    code: `print("============Bienvenue dans le cybercafe la vie ================")
+
+client_name = input("Entrez votre nom : ")
+heure_arrivee = int(input("Entrez l'heure d'arrivée : "))
+heure_depart = int(input("Entrez l'heure de départ : "))
+
+prix_par_heure = 250
+duree = heure_depart - heure_arrivee
+montant_total = duree * prix_par_heure
+
+if duree < 3:
+    montant_total = montant_total * 0.10
+
+print("=================================================")
+print("Client : ", client_name)
+print("Durée de la session : ", duree, " heures")
+print("Montant total : ", montant_total, " F CFA")`
+  },
+  {
+    id: "imc",
+    filename: "imc.py",
+    description: "Calcule l'indice de masse corporelle (IMC) à partir du poids et de la taille.",
+    prompts: ["Entrez votre poids en kg : ", "Entrez votre taille en m : "],
+    defaults: ["70", "1.75"],
+    code: `weight=input("Entrez votre poids en kg : ")
+height=input("Entrez votre taille en m : ")
+imc = float(weight) / (float(height) ** 2)
+
+print("Votre poids est : ", weight, "kg")
+print("Votre taille est : ", height, "m")
+print("Votre IMC est : ", imc)`
+  },
+  {
+    id: "tp2",
+    filename: "tp2.py",
+    description: "Facture pain, lait et sucre avec TVA pour sama multi_services.",
+    prompts: [
+      "Entrez le prix du pain (en FCFA, nombre seulement) : ", "Entrez la quantité de pain : ",
+      "Entrez le prix du lait (en FCFA, nombre seulement) : ", "Entrez la quantité de lait : ",
+      "Entrez le prix du sucre (en FCFA, nombre seulement) : ", "Entrez la quantité de sucre : "
+    ],
+    defaults: ["500", "2", "1000", "1", "750", "1"],
+    code: `print("=================================================")
+print("bienvenue a sama multi_services")
+print("=================================================")
+
+price_bread = float(input("Entrez le prix du pain (en FCFA, nombre seulement) : "))
+quantity_bread = float(input("Entrez la quantité de pain : "))
+price_b = price_bread * quantity_bread
+
+price_milk = float(input("Entrez le prix du lait (en FCFA, nombre seulement) : "))
+quantity_milk = float(input("Entrez la quantité de lait : "))
+price_m = price_milk * quantity_milk
+
+price_sugar = float(input("Entrez le prix du sucre (en FCFA, nombre seulement) : "))
+quantity_sugar = float(input("Entrez la quantité de sucre : "))
+price_s = price_sugar * quantity_sugar
+
+ht = price_b + price_m + price_s
+tva = ht * 0.18
+ttc = ht + tva
+
+print("=================================================")
+print("montant HT: ", ht,"cfa")
+print("montant TVA: ", tva,"cfa")
+print("montant TTC: ", ttc,"cfa")
+print("Merci d'avoir utilisé sama multi_services")`
+  }
+];
+
+function escapeHtml(str){
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function highlightPython(code){
+  let out = escapeHtml(code);
+  out = out.replace(/(".*?"|'.*?')/g, '<span class="tok-str">$1</span>');
+  out = out.replace(/\b(if|else|elif|for|while|def|return|import|from|as|in|not|and|or|True|False|None|class|try|except|finally|break|continue)\b/g, '<span class="tok-kw">$1</span>');
+  out = out.replace(/\b(input|print|float|int|round|str|len)\b(?=\()/g, '<span class="tok-fn">$1</span>');
+  return out;
+}
+
+let pyodide = null;
+let runScriptFn = null;
+let pyodideReady = false;
+let activeId = scripts[0].id;
+
+function byId(s){ return scripts.find(x => x.id === s); }
+
+function buildSidebar(){
+  const sidebar = document.getElementById("sidebar");
+  scripts.forEach(s => {
+    const row = document.createElement("button");
+    row.className = "nav-row" + (s.id === activeId ? " active" : "");
+    row.id = "row-" + s.id;
+    row.setAttribute("aria-label", s.filename);
+    row.innerHTML =
+      '<div class="nav-box">' +
+        '<span class="nav-title">' + s.filename + '</span>' +
+        '<span class="nav-dot" id="dot-' + s.id + '">●</span>' +
+      '</div>' +
+      '<div class="nav-desc">' + s.description + '</div>';
+    row.addEventListener("click", () => selectScript(s.id));
+    sidebar.appendChild(row);
+  });
+}
+
+function selectScript(id){
+  activeId = id;
+  document.querySelectorAll(".nav-row").forEach(r => r.classList.remove("active"));
+  document.getElementById("row-" + id).classList.add("active");
+  renderDetail(id);
+}
+
+function renderDetail(id){
+  const s = byId(id);
+  document.getElementById("detail-filename").textContent = s.filename;
+  document.getElementById("detail-code").innerHTML = highlightPython(s.code);
+  document.getElementById("detail-desc").textContent = s.description;
+
+  const inputsEl = document.getElementById("detail-inputs");
+  inputsEl.innerHTML = "";
+  s.inputEls = [];
+  s.prompts.forEach((p, i) => {
+    const chip = document.createElement("label");
+    chip.className = "input-chip";
+    const label = document.createElement("span");
+    label.textContent = p.trim();
+    label.title = p.trim();
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.value = (s.currentInputs && s.currentInputs[i] !== undefined) ? s.currentInputs[i] : s.defaults[i];
+    chip.appendChild(label);
+    chip.appendChild(inp);
+    inputsEl.appendChild(chip);
+    s.inputEls.push(inp);
+  });
+
+  const statusEl = document.getElementById("detail-status");
+  const consoleEl = document.getElementById("detail-console");
+  if (s.status === "running"){
+    statusEl.className = "detail-status running";
+    consoleEl.innerHTML = '<span class="dim">exécution en cours…</span>';
+  } else if (s.status === "ok" || s.status === "error"){
+    statusEl.className = "detail-status " + s.status;
+    consoleEl.textContent = "";
+    consoleEl.appendChild(document.createTextNode(s.lastOutput || ""));
+    if (s.status === "error"){
+      const errSpan = document.createElement("span");
+      errSpan.className = "err";
+      errSpan.textContent = (s.lastOutput ? "\n" : "") + "⚠ " + s.lastErr;
+      consoleEl.appendChild(errSpan);
+    }
+  } else {
+    statusEl.className = "detail-status";
+    consoleEl.innerHTML = '<span class="dim">en attente d\u2019exécution…</span>';
+  }
+}
+
+function setNavDot(s){
+  const dot = document.getElementById("dot-" + s.id);
+  dot.className = "nav-dot" + (s.status ? " " + s.status : "");
+}
+
+async function runOne(s, isAuto){
+  if (!pyodideReady) return;
+  s.status = "running";
+  setNavDot(s);
+  if (activeId === s.id) renderDetail(s.id);
+
+  const inputValues = s.inputEls && !isAuto ? s.inputEls.map(inp => inp.value) : s.currentInputs || s.defaults;
+  s.currentInputs = inputValues;
+  const pyInputs = pyodide.toPy(inputValues);
+  let output = "", err = null;
+  try{
+    const result = runScriptFn(s.code, pyInputs);
+    const arr = result.toJs();
+    output = arr[0];
+    err = arr[1];
+    result.destroy();
+  } catch(e){
+    err = String(e);
+  }
+  pyInputs.destroy();
+
+  s.lastOutput = output;
+  s.lastErr = err;
+  s.status = err ? "error" : "ok";
+  setNavDot(s);
+  if (activeId === s.id) renderDetail(s.id);
+}
+
+async function init(){
+  const globalStatus = document.getElementById("global-status");
+  pyodide = await loadPyodide();
+  globalStatus.textContent = "Pyodide chargé — exécution automatique en cours…";
+
+  pyodide.runPython(`
+import sys, io, builtins
+
+def run_script(code, inputs):
+    output = io.StringIO()
+    old_stdout = sys.stdout
+    old_input = builtins.input
+    state = {'i': 0}
+    def fake_input(prompt=''):
+        val = inputs[state['i']] if state['i'] < len(inputs) else ''
+        state['i'] += 1
+        output.write(str(prompt) + str(val) + "\\n")
+        return val
+    builtins.input = fake_input
+    sys.stdout = output
+    err = None
+    try:
+        exec(code, {'__name__': '__main__'})
+    except Exception as e:
+        err = type(e).__name__ + ': ' + str(e)
+    finally:
+        sys.stdout = old_stdout
+        builtins.input = old_input
+    return [output.getvalue(), err]
+`);
+  runScriptFn = pyodide.globals.get("run_script");
+  pyodideReady = true;
+
+  for (const s of scripts){
+    await runOne(s, true);
+    await new Promise(r => setTimeout(r, 100));
+  }
+  globalStatus.textContent = scripts.length + "/" + scripts.length + " scripts exécutés ✓";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  buildSidebar();
+  renderDetail(activeId);
+  document.getElementById("detail-rerun").addEventListener("click", () => runOne(byId(activeId), false));
+  document.getElementById("rerun-all").addEventListener("click", async () => {
+    document.getElementById("global-status").textContent = "réexécution en cours…";
+    for (const s of scripts){ await runOne(s, false); }
+    document.getElementById("global-status").textContent = scripts.length + "/" + scripts.length + " scripts exécutés ✓";
+  });
+  init();
+});
+</script>
+</body>
+</html>
