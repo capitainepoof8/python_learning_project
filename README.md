@@ -12,9 +12,11 @@ Une collection de petits scripts Python écrits dans le cadre de mon apprentissa
 | [`bulletin.py`](bulletin.py) | Génère un bulletin de notes pour 5 cours (devoir 40% / examen 60%) et calcule la moyenne générale. |
 | [`imc.py`](imc.py) | Calcule l'Indice de Masse Corporelle (IMC) à partir du poids et de la taille. |
 | [`convertisseur.py`](convertisseur.py) | Convertit un montant en Francs CFA vers l'Euro et le Dollar US. |
+| [`conv_cell_fa`](conversisseur_cell_to_fra.py) | convertir les degree en cellcuce et vice versa. |
 | [`cybercafe.py`](cybercafe.py) | Calcule le montant à payer pour une session dans un cybercafé, avec une réduction si la durée est inférieure à 3 heures. |
 | [`tp2.py`](tp2.py) | Simule une facture pour "Sama Multi Services" (pain, lait, sucre) avec calcul du montant HT, de la TVA (18%) et du TTC. |
 
+## console-python-tps.html   (page html ayant pour bute de ressence les fiches de se repot )
 ## 🚀 Utilisation
 
 Chaque script est autonome et s'exécute directement avec Python 3 :
